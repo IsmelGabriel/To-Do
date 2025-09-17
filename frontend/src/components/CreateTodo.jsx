@@ -3,20 +3,20 @@ import './CreateTodo.css';
 
 const CreateTodo = ({ isOpen, onClose, onCreateTodo }) => {
   const [todoData, setTodoData] = useState({
-    titulo: '',
-    descripcion: '',
-    prioridad: 'Media',
-    estado: 'Pendiente'
+    title: '',
+    description: '',
+    priority: 'Media',
+    state: 'Pendiente'
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onCreateTodo(todoData);
     setTodoData({
-      titulo: '',
-      descripcion: '',
-      prioridad: 'Media',
-      estado: 'Pendiente'
+      title: '',
+      description: '',
+      priority: 'Media',
+      state: 'Pendiente'
     });
     onClose();
   };
@@ -40,33 +40,33 @@ const CreateTodo = ({ isOpen, onClose, onCreateTodo }) => {
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="titulo">Título</label>
+            <label htmlFor="title">Título</label>
             <input
               type="text"
-              id="titulo"
-              name="titulo"
-              value={todoData.titulo}
+              id="title"
+              name="title"
+              value={todoData.title}
               onChange={handleChange}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="descripcion">Descripción</label>
+            <label htmlFor="description">Descripción</label>
             <textarea
-              id="descripcion"
-              name="descripcion"
-              value={todoData.descripcion}
+              id="description"
+              name="description"
+              value={todoData.description}
               onChange={handleChange}
               rows="3"
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="prioridad">Prioridad</label>
+            <label htmlFor="priority">Prioridad</label>
             <select
-              id="prioridad"
-              name="prioridad"
-              value={todoData.prioridad}
+              id="priority"
+              name="priority"
+              value={todoData.priority}
               onChange={handleChange}
             >
               <option value="Baja">Baja</option>

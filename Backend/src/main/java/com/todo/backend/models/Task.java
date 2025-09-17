@@ -5,19 +5,18 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table (name = "tasks")
+@Table(name = "tasks")
 public class Task {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    public String title;
-    public String description;
-    public String priority;
-    public String status;
+    private String title;
+    private String description;
+    private String priority;
+    private String status;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-
 }

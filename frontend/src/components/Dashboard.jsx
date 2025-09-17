@@ -1,95 +1,120 @@
-import React, { useState } from 'react';
-import TodoItem from './TodoItem';
-import CreateTodo from './CreateTodo';
-import './Dashboard.css';
+import React, { useState, useEffect } from "react";
+import TodoItem from "./TodoItem";
+import CreateTodo from "./CreateTodo";
+import { taskService } from "../services/taskService";
+import "./Dashboard.css";
 
 function Dashboard() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  // Esta es una simulación de datos. En un caso real, estos vendrían de tu base de datos
-  const [todos, setTodos] = useState([
-    {
-      id: 1,
-      titulo: "Completar el proyecto",
-      descripcion: "Terminar el desarrollo del dashboard de ToDo",
-      prioridad: "Alta",
-      estado: "En Progreso"
-    },
-    {
-      id: 2,
-      titulo: "Reunión de equipo",
-      descripcion: "Preparar presentación para la reunión semanal",
-      prioridad: "Media",
-      estado: "Pendiente"
-    },
-    {
-      id: 3,
-      titulo: "Actualizar documentación",
-      descripcion: "Actualizar la documentación del proyecto",
-      prioridad: "Baja",
-      estado: "Completada"
+  const [todos, setTodos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const token = localStorage.getItem("token"); // guardado en login
+
+  // 🔹 Cargar tareas al iniciar
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const data = await taskService.getAll(token);
+        setTodos(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (token) fetchTasks();
+  }, [token]);
+
+  // 🔹 Actualizar estado
+  const handleUpdateStatus = async (id, newStatus) => {
+    try {
+      const task = todos.find((t) => t.id === id);
+      if (!task) return;
+      const updated = await taskService.update(
+        id,
+        { ...task, status: newStatus },
+        token
+      );
+      setTodos(todos.map((t) => (t.id === id ? updated : t)));
+    } catch (err) {
+      setError(err.message);
     }
-  ]);
-
-  const handleUpdateStatus = (id, newStatus) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, estado: newStatus } : todo
-    ));
   };
 
-  const handleUpdatePriority = (id, newPriority) => {
-    setTodos(todos.map(todo => 
-      todo.id === id ? { ...todo, prioridad: newPriority } : todo
-    ));
+  // 🔹 Actualizar prioridad
+  const handleUpdatePriority = async (id, newPriority) => {
+    try {
+      const task = todos.find((t) => t.id === id);
+      if (!task) return;
+      const updated = await taskService.update(
+        id,
+        { ...task, priority: newPriority },
+        token
+      );
+      setTodos(todos.map((t) => (t.id === id ? updated : t)));
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
-  const handleCreateTodo = (newTodo) => {
-    // Generar un ID temporal (en producción, el backend asignaría el ID)
-    const id = todos.length > 0 ? Math.max(...todos.map(t => t.id)) + 1 : 1;
-    setTodos([...todos, { ...newTodo, id }]);
+  // 🔹 Crear tarea
+  const handleCreateTodo = async (newTodo) => {
+    try {
+      const created = await taskService.create(newTodo, token);
+      setTodos([...todos, created]);
+    } catch (err) {
+      setError(err.message);
+    }
   };
+
+  const handleDeleteTodo = async (id) => {
+    try {
+      await taskService.remove(id, token);
+      setTodos(todos.filter((t) => t.id !== id));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  if (loading) return <p>Cargando tareas...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div className="dashboard">
       <header className="dashboard-header">
         <div className="header-top">
           <h1>Lista de Tareas</h1>
-          <button 
+          <button
             className="create-todo-button"
             onClick={() => setIsCreateModalOpen(true)}
           >
             + Nueva Tarea
           </button>
         </div>
-        <div className="filters">
-          <select className="filter-select">
-            <option value="todas">Todas las prioridades</option>
-            <option value="alta">Alta prioridad</option>
-            <option value="media">Media prioridad</option>
-            <option value="baja">Baja prioridad</option>
-          </select>
-          <select className="filter-select">
-            <option value="todos">Todos los estados</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="en-progreso">En Progreso</option>
-            <option value="completada">Completada</option>
-          </select>
-        </div>
       </header>
-      
-      <CreateTodo 
+
+      <CreateTodo
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onCreateTodo={handleCreateTodo}
       />
+
       <div className="todos-container">
-        {todos.map(todo => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            onUpdateStatus={handleUpdateStatus}
-            onUpdatePriority={handleUpdatePriority}
-          />
-        ))}
+        {todos.length === 0 ? (
+          <p>No hay tareas aún</p>
+        ) : (
+          todos.map((todo) => (
+            <TodoItem
+              key={todo.id}
+              todo={todo}
+              onUpdateStatus={handleUpdateStatus}
+              onUpdatePriority={handleUpdatePriority}
+              onDelete={handleDeleteTodo}
+            />
+          ))
+        )}
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
 
-  // Validaciones básicas
+  // Validar informacion ingresada en el formulario
   const validateForm = () => {
     const newErrors = {};
 
@@ -39,11 +39,9 @@ function Login() {
     setIsLoading(true);
     try {
       if (isLogin) {
-        // login → authService ya guarda token y user
         await authService.login(formData.name, formData.password);
         navigate('/dashboard');
       } else {
-        // registro → luego redirige a login
         await authService.register(formData.name, formData.password);
         setIsLogin(true);
         setFormData({ name: '', password: '' });
