@@ -37,12 +37,48 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
+  transition: all 0.2s;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.form-group input.error {
+  border-color: #dc3545;
+  background-color: #fff8f8;
+}
+
+.form-group input.error:focus {
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+}
+
+.field-error {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.error-message {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  background-color: #ccc;
 }
 
 button[type="submit"] {

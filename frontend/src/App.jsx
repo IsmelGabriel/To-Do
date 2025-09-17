@@ -4,14 +4,13 @@ import Login from './components/Login'
 import './App.css'
 
 function App() {
-  // Temporalmente permitimos acceso al dashboard sin autenticación
   return (
     <Router>
       <div className="App">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
       </div>
     </Router>

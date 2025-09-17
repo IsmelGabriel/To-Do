@@ -1,17 +1,65 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { authService } from '../services/authService';
 import './Login.css';
 
 function Login() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
-    username: '',
+    name: '',
     password: ''
   });
+  const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState('');
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.name.trim()) {
+      newErrors.name = 'El nombre de usuario es requerido';
+    } else if (formData.name.length < 3) {
+      newErrors.name = 'El nombre de usuario debe tener al menos 3 caracteres';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'La contraseña es requerida';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí se implementará la lógica de autenticación
-    console.log('Form submitted:', formData);
+    setApiError('');
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      if (isLogin) {
+        const { token } = await authService.login(formData.name, formData.password);
+        // Store token or user data in localStorage/context if needed
+        localStorage.setItem('token', token);
+        // Si el login es exitoso, redirigir al dashboard
+        navigate('/dashboard');
+      } else {
+        await authService.register(formData.name, formData.password);
+        // Después del registro exitoso, cambiar a la vista de login
+        setIsLogin(true);
+        setFormData({ name: '', password: '' });
+      }
+    } catch (error) {
+      setApiError(error.message || 'Ocurrió un error. Por favor intenta de nuevo.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -20,6 +68,11 @@ function Login() {
       ...prevState,
       [name]: value
     }));
+    // Limpiar el error del campo cuando el usuario empieza a escribir
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    setApiError('');
   };
 
   return (
@@ -28,12 +81,12 @@ function Login() {
         <h2>{isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">Nombre de Usuario</label>
+            <label htmlFor="name">Nombre de Usuario</label>
             <input
               type="text"
-              id="username"
-              name="username"
-              value={formData.username}
+              id="name"
+              name="name"
+              value={formData.name}
               onChange={handleInputChange}
               required
             />
@@ -49,10 +102,11 @@ function Login() {
               required
             />
           </div>
-          <button type="submit">
-            {isLogin ? 'Iniciar Sesión' : 'Registrarse'}
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? 'Cargando...' : (isLogin ? 'Iniciar Sesión' : 'Registrarse')}
           </button>
         </form>
+        {apiError && <p className="error-message">{apiError}</p>}
         <p className="toggle-form">
           {isLogin ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}
           <button
