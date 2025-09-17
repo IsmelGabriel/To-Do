@@ -44,8 +44,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
         userService.createUser(registerRequest);
-        return ResponseEntity.ok("Usuario registrado!");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Usuario registrado!");
+        return ResponseEntity.ok(response);
     }
+
 }

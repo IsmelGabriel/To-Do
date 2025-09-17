@@ -11,7 +11,6 @@ export const authService = {
           'Accept': 'application/json'
         },
         body: JSON.stringify({ name, password }),
-        credentials: 'include'
       });
 
       const data = await response.json();
@@ -53,5 +52,40 @@ export const authService = {
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+  },
+
+  isAuthenticated: () => {
+    const token = localStorage.getItem('token');
+    return !!token;
+  },
+
+  getUser: () => {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  },
+
+  authFetch: async (url, options = {}) => {
+    const token = localStorage.getItem('token');
+
+    const headers = {
+      ...options.headers,
+      'Content-Type': 'application/json',
+    };
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      ...options,
+      headers
+    });
+
+    if (response.status === 401) {
+      authService.logout();
+      throw new Error('Sesión expirada. Inicia sesión nuevamente.');
+    }
+
+    return response.json();
   }
 };
