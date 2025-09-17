@@ -1,0 +1,90 @@
+.todo-item {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  border-left: 4px solid #ddd;
+  transition: border-left-color 0.3s ease;
+}
+
+.todo-item[data-status="Pendiente"] {
+  border-left-color: #dc3545;
+}
+
+.todo-item[data-status="En Progreso"] {
+  border-left-color: #ffc107;
+}
+
+.todo-item[data-status="Completada"] {
+  border-left-color: #28a745;
+}
+
+.todo-content {
+  flex: 1;
+}
+
+.todo-content h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.description {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.todo-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.control-group label {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+  background-color: white;
+}
+
+.status-select {
+  border-width: 2px;
+  font-weight: 500;
+}
+
+.status-select.status-pendiente {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.status-select.status-en-progreso {
+  color: #ffc107;
+  border-color: #ffc107;
+}
+
+.status-select.status-completada {
+  color: #28a745;
+  border-color: #28a745;
+}
+
+.priority-select {
+  color: #666;
+  border-color: #ddd;
+}
